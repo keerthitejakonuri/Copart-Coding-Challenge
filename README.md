@@ -12,4 +12,10 @@ Argument_1: path to zip_codes_states.csv
 Argument_2: Longitude of your location
 Argument_3: Latitude of your Location
 
-3.
+3. javac Licensekeys.java
+   java LicenseKeys
+   
+4. javac StringToInteger.java
+    java StringToInteger
+    
+ 
