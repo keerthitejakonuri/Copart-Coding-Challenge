@@ -18,6 +18,14 @@ class Dataset{
 	}
 }
 
+class Points{
+	int point1, point2;
+	public Points(int point1, int point2){
+		this.point1 = point1;
+		this.point2 = point2;
+	}
+}
+
 public class KNN {
 	
 	public static HashMap<Integer,String> mapNames;
@@ -112,7 +120,7 @@ public class KNN {
 		return data;
 	}
 	
-	public static void calculateTwoNearestNeighbours(Dataset data, String longitude, String latitude){
+	public static Points calculateTwoNearestNeighbours(Dataset data, String longitude, String latitude){
 		float lo = Float.valueOf(longitude);
 		float la = Float.valueOf(latitude);
 		int point1 = 0, point2 = 0;
@@ -134,16 +142,46 @@ public class KNN {
 		System.out.println("Two nearest neighbours to ["+longitude+" , "+latitude+"]");
 		System.out.println("[ "+data.dataset2[point1][0] +" , "+ data.dataset1[point1][0]+" , "+data.dataset1[point1][1]+" , "+data.dataset2[point1][1]+" , "+data.dataset2[point1][2]+" , "+data.dataset2[point1][3]);
 		System.out.println("[ "+data.dataset2[point2][0] +" , "+ data.dataset1[point2][0]+" , "+data.dataset1[point2][1]+" , "+data.dataset2[point2][1]+" , "+data.dataset2[point2][2]+" , "+data.dataset2[point2][3]);
+	
+		return new Points(point1,point2);
+	}
+	
+	public static Points calculateNextTwoNearestNeighbours(Dataset data, String longitude, String latitude, Points p){
+		float lo = Float.valueOf(longitude);
+		float la = Float.valueOf(latitude);
+		int point1 = 0, point2 = 0;
+		float distance1 = Float.MAX_VALUE, distance2 = Float.MAX_VALUE;
+		for(int i = 0; i < data.dataset1.length;i++){
+			if(i != p.point1 && i != p.point2){
+				float x = data.dataset1[i][0];
+				float y = data.dataset1[i][1];
+				float distance = (x-lo)*(x-lo) + (y-la)*(y-la);
+				if((distance < distance1)&&(distance < distance2)){
+					distance2 = distance1;
+					distance1 = distance;
+					point2 = point1;
+					point1 = i;
+				}else if(distance < distance2){
+					distance2 = distance;
+					point2 = i;
+				}
+			}
+		}
+		
+		System.out.println("Next two nearest neighbours to ["+longitude+" , "+latitude+"]");
+		System.out.println("[ "+data.dataset2[point1][0] +" , "+ data.dataset1[point1][0]+" , "+data.dataset1[point1][1]+" , "+data.dataset2[point1][1]+" , "+data.dataset2[point1][2]+" , "+data.dataset2[point1][3]);
+		System.out.println("[ "+data.dataset2[point2][0] +" , "+ data.dataset1[point2][0]+" , "+data.dataset1[point2][1]+" , "+data.dataset2[point2][1]+" , "+data.dataset2[point2][2]+" , "+data.dataset2[point2][3]);
+		
+	return new Points(point1,point2);
 	}
 	
 	public static void main(String[] args)throws IOException {
 		// TODO Auto-generated method stub
-			Scanner sc = new Scanner(System.in);
 			int count = count(args[0]);
 			Dataset data = parseDataSet(args[0],count-1);
 			data = handleMissingData(data);
-			calculateTwoNearestNeighbours(data,args[1],args[2]);
-			sc.close();
+			Points p = calculateTwoNearestNeighbours(data,args[1],args[2]);
+			Points p1 = calculateNextTwoNearestNeighbours(data,args[1],args[2],p);
 	}
 
 }
